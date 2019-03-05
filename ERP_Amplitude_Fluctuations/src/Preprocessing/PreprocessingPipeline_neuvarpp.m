@@ -78,6 +78,7 @@ if ~isempty(main_path)
     main_path = regexprep(temp.Filename, '(.+)\\.+\\.+\.m', '$1');
 end
 
+% =========================================================================
 % Add path
 addpath(genpath([main_path '\src'])); % source code
 % addpath(genpath([main_path '\ext'])); % extensions
@@ -97,35 +98,14 @@ neuvarpp_eventcor(main_path, subjects, correction_table, spontaneous_thr, end_th
 neuvarpp_filtering(main_path, subject_list, ds_rate, high_pass, low_pass, s3ovrwrt);
 
 %% 4) Add location data and perform non-stanionary filtering 
-neuvarpp_nonstationaryclean(main_path, subject_list, electrode_location, ignore_ch, corr_asr, std_asr, windowthr_asr, overwrite)
+neuvarpp_nonstationaryclean(main_path, subject_list, electrode_location, ignore_ch, corr_asr, std_asr, windowthr_asr, s4ovrwrt)
 
 %% 5) Remove artifacts using MARA with SOBI
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-neuvarpp_stationaryclean(main_path, subject_list, s4ovrwrt);
+neuvarpp_stationaryclean(main_path, subject_list, s5ovrwrt);
 
 %% 6) Check for event consistency - epoch data
-neuvarpp_epochs(main_path, subject_list, epoch_len, bl_len, s5ovrwrt);
-=======
-=======
->>>>>>> parent of cb502db... general update
-=======
->>>>>>> parent of cb502db... general update
-=======
->>>>>>> parent of cb502db... general update
-neuvarpp_stationaryclean(main_path, subjects, s4ovrwrt);
+neuvarpp_stationaryclean(main_path, subjects, s6ovrwrt);
 
-%% 6) Check for event consistency - epoch data
-neuvarpp_epochs(main_path, subjects, epoch_len, bl_len, s5ovrwrt);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of cb502db... general update
-=======
->>>>>>> parent of cb502db... general update
-=======
->>>>>>> parent of cb502db... general update
-=======
->>>>>>> parent of cb502db... general update
+%% 7) Check for event consistency - epoch data
+neuvarpp_epochs(main_path, subjects, epoch_len, bl_len, s7ovrwrt);
+
