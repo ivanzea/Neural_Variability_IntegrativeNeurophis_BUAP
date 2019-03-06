@@ -78,7 +78,7 @@ for subjectindex = 1:length(subject_list)
        end
        
        % Loop through each file to be converted
-       for fileindex = 1:length(input_file_list)
+       parfor fileindex = 1:length(input_file_list)
             if isempty(regexp(input_file_list{fileindex}, '(close|open|alpha)', 'once')) % avoid files used as references
                
                 % Import cnt files by converting to set files
@@ -92,3 +92,4 @@ for subjectindex = 1:length(subject_list)
        end
    end
 end
+disp('Step 1 DONE');

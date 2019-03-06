@@ -81,7 +81,7 @@ for subjectindex = 1:length(subject_list)
    if ~isempty(input_file_list)
        
        % Loop through each file
-       for fileindex = 1:length(input_file_list)
+       parfor fileindex = 1:length(input_file_list)
            % Load the input raw set file
            set_file = pop_loadset(input_file_list{fileindex}, input_path);
 
@@ -100,3 +100,4 @@ for subjectindex = 1:length(subject_list)
        end
    end
 end
+disp('Step 3 DONE');

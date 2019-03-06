@@ -199,3 +199,4 @@ for subjectindex = 1:length(subject_list)
        end
    end
 end
+disp('Step 2 DONE');

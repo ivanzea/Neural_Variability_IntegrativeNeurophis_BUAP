@@ -46,8 +46,8 @@ Output:
 %}
 %% Check input arguments
 % How many arguments?
-minArgs = 5;
-maxArgs = 6;
+minArgs = 7;
+maxArgs = 8;
 narginchk(minArgs,maxArgs);
 
 % Set default values
@@ -116,3 +116,4 @@ for subjectindex = 1:length(subject_list)
        end
    end
 end
+disp('Step 4 DONE');
