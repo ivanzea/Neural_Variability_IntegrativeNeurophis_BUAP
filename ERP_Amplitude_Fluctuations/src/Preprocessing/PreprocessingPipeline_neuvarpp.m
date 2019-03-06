@@ -81,12 +81,24 @@ end
 % =========================================================================
 % Add path
 addpath(genpath([main_path '\src'])); % source code
-% addpath(genpath([main_path '\ext'])); % extensions
+if isempty(which('eeglab'))
+    addpath(genpath([main_path '\ext\eeglab14_1_2b'])); % extensions
+end
 
 % Add location file becuase it is inside eeglab library... comment out if
 % a file is external
 eeglabpath = regexprep(which('eeglab'), '(.*)\\eeglab.m', '$1');
 electrode_location = [eeglabpath electrode_location];
+
+% Initialize eeglab
+eeglab();
+clear ALLCOM ALLEEG CURRENTSET CURRENTSTUDY EEG LASTCOM PLUGINLIST STUDY eeglabUpdater;
+close all;
+
+% Initialize parallel pool
+if isempty(gcp('nocreate'))
+    parpool();
+end
 
 %% 1) Convert CNT to SET files (EEGLAB standards)
 neurvarpp_cnt2set(main_path, subjects, s1ovrwrt);
