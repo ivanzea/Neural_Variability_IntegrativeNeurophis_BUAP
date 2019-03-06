@@ -12,7 +12,6 @@ s3ovrwrt = 0;
 s4ovrwrt = 0;
 s5ovrwrt = 0;
 s6ovrwrt = 0;
-s7ovrwrt = 0;
 
 % =========================================================================
 % Step 2 parameters:
@@ -123,8 +122,5 @@ neuvarpp_nonstationaryclean(main_path, subject_list, electrode_location_full, ig
 neuvarpp_stationaryclean(main_path, subject_list, s5ovrwrt);
 
 %% 6) Check for event consistency - epoch data
-neuvarpp_stationaryclean(main_path, subject_list, s6ovrwrt);
-
-%% 7) Check for event consistency - epoch data
-neuvarpp_epochs(main_path, subject_list, epoch_len, bl_len, s7ovrwrt);
+neuvarpp_epochs(main_path, subject_list, epoch_len, bl_len, s6ovrwrt);
 
