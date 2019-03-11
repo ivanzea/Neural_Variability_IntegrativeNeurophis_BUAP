@@ -3,7 +3,7 @@
 clear; clc; close all;
 %% Define Prprocessing Parameters
 % Subject names (folder names) to process | if empty {} -> all subjects/folders will be used
-subject_list = {'Dalia'};
+subject_list = {'Abraham'};
 
 % Overwrite files
 s1ovrwrt = 0;
@@ -76,18 +76,30 @@ windowthr_asr = 0.5; % percent of channels in a specific 1s window that are flag
 epoch_len = [-0.2, 0.5]; % epoch boundaries in seconds
 bl_len = [-200, 0]; % baseline boundaries in ms
 
-%% Detect running path and add preprocessing code to path
+%% Detect running path 
 main_path = mfilename('fullpath');
 if ~isempty(main_path)
     temp = matlab.desktop.editor.getActive; % what path is being used to run this program?
     main_path = regexprep(temp.Filename, '(.+)\\.+\\.+\\.+\.m', '$1');
 end
 
-% =========================================================================
+%% Initialize parallel processing
+% Initialize parallel pool
+if isempty(gcp('nocreate'))
+    parpool();
+end
+
+%% Add code base from src and ext folders
 % Add path
 addpath(genpath([main_path '\src'])); % source code
+addpath([main_path '\ext']); % extensions code
+
+%Check for existing eeglab libraries
 if isempty(which('eeglab'))
-    addpath(genpath([main_path '\ext\eeglab14_1_2b'])); % extensions
+    addpath([main_path '\ext\eeglab14_1_2b']); % extensions
+else
+    rmpath(which('eeglab')); % remove existing path and use the one provided
+    addpath([main_path '\ext\eeglab14_1_2b']); % extensions
 end
 
 % Add location file becuase it is inside eeglab library... comment out if
@@ -100,11 +112,6 @@ eeglab();
 clear ALLCOM ALLEEG CURRENTSET CURRENTSTUDY EEG LASTCOM PLUGINLIST STUDY eeglabUpdater;
 close all;
 clc;
-
-% Initialize parallel pool
-if isempty(gcp('nocreate'))
-    parpool();
-end
 
 %% 1) Convert CNT to SET files (EEGLAB standards)
 neurvarpp_cnt2set(main_path, subject_list, s1ovrwrt);
