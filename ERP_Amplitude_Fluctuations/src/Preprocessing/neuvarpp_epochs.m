@@ -83,14 +83,25 @@ for subjectindex = 1:length(subject_list)
            % Find events
            unique_events = unique([set_file.urevent.type]);
 
+           % Initialize set_info variable
+           set_info = [];
+           
            for stimtypeindex = 1:length(unique_events)
                % Generate epoch data with baseline correction
-               set_file(stimtypeindex) = pop_epoch(set_file(stimtypeindex), {num2str(unique_events(stimtypeindex))}, epoch_len);
-               set_file(stimtypeindex) = pop_rmbase(set_file(stimtypeindex), bl_len);
+               epoch_set_file = pop_epoch(set_file, {num2str(unique_events(stimtypeindex))}, epoch_len);
+               epoch_set_file = pop_rmbase(epoch_set_file, bl_len);
+               
+               % Get all info from the set file
+               set_info(stimtypeindex).filename = regexprep(epoch_set_file.filename, '(.+)_.+', '$1');
+               set_info(stimtypeindex).stimtype = stimtypeindex;
+               set_info(stimtypeindex).chnames = {epoch_set_file.chanlocs.labels};
+               set_info(stimtypeindex).srate = epoch_set_file.srate;
+               set_info(stimtypeindex).times = epoch_set_file.times;
+               set_info(stimtypeindex).epochs = epoch_set_file.data;
            end
 
            % Save the .set file in 'SetData' folder
-           save([output_path '\' output_file_list{fileindex}], 'stim_set_file');
+           save([output_path '\' output_file_list{fileindex}], 'set_info');
        end
    end
 end

@@ -123,11 +123,10 @@ neuvarpp_eventcor(main_path, subject_list, correction_table, spontaneous_thr, en
 neuvarpp_filtering(main_path, subject_list, ds_rate, high_pass, low_pass, s3ovrwrt);
 
 %% 4) Add location data and perform non-stanionary filtering 
-neuvarpp_nonstationaryclean(main_path, subject_list, electrode_location_full, ignore_ch, corr_asr, std_asr, windowthr_asr, s4ovrwrt)
+neuvarpp_nonstationaryclean(main_path, subject_list, electrode_location_full, ignore_ch, corr_asr, std_asr, windowthr_asr, s4ovrwrt);
 
 %% 5) Remove artifacts using MARA with SOBI
 neuvarpp_stationaryclean(main_path, subject_list, s5ovrwrt);
 
 %% 6) Check for event consistency - epoch data
 neuvarpp_epochs(main_path, subject_list, epoch_len, bl_len, s6ovrwrt);
-
