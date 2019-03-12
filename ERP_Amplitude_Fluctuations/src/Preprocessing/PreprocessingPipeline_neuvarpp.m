@@ -3,7 +3,7 @@
 clear; clc; close all;
 %% Define Prprocessing Parameters
 % Subject names (folder names) to process | if empty {} -> all subjects/folders will be used
-subject_list = {'Abraham'};
+subject_list = {''};
 
 % Overwrite files
 s1ovrwrt = 0;
@@ -60,7 +60,7 @@ low_pass = 40; % Hz
 % =========================================================================
 % Step 4 parameters:
 % Electrode location template file
-electrode_location = '\functions\resources\Standard-10-5-Cap385_witheog.elp'; % this one is inside eeglabs path
+electrode_location = '\ext\location_files\Standard-10-5-Cap385_witheog.elp'; % this one is inside eeglabs path
 
 % Known EEG channels without ERP signal
 ignore_ch = {'CB1' 'CB2' 'HEO' 'VEO' 'EKG' 'EMG' 'HL1'};
@@ -104,8 +104,7 @@ end
 
 % Add location file becuase it is inside eeglab library... comment out if
 % a file is external
-eeglabpath = regexprep(which('eeglab'), '(.*)\\eeglab.m', '$1');
-electrode_location_full = [eeglabpath electrode_location];
+electrode_location_full = [main_path electrode_location];
 
 % Initialize eeglab
 eeglab();
@@ -128,5 +127,5 @@ neuvarpp_nonstationaryclean(main_path, subject_list, electrode_location_full, ig
 %% 5) Remove artifacts using MARA with SOBI
 neuvarpp_stationaryclean(main_path, subject_list, s5ovrwrt);
 
-%% 6) Check for event consistency - epoch data
+%% 6) Epoch data convert to matlab structure
 neuvarpp_epochs(main_path, subject_list, epoch_len, bl_len, s6ovrwrt);
