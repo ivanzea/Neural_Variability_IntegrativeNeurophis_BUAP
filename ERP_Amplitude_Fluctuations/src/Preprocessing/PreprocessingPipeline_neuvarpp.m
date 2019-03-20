@@ -3,7 +3,7 @@
 clear; clc; close all;
 %% Define Prprocessing Parameters
 % Subject names (folder names) to process | if empty {} -> all subjects/folders will be used
-subject_list = {''};
+subject_list = {};
 
 % Overwrite files
 s1ovrwrt = 0;
@@ -63,7 +63,7 @@ low_pass = 40; % Hz
 electrode_location = '\ext\location_files\Standard-10-5-Cap385_witheog.elp'; % this one is inside eeglabs path
 
 % Known EEG channels without ERP signal
-ignore_ch = {'CB1' 'CB2' 'HEO' 'VEO' 'EKG' 'EMG' 'HL1'};
+ignore_ch = {'CB1' 'CB2' 'HEO' 'VEO' 'EKG' 'EMG' 'HL1' 'M1' 'M2'};
 
 % ASR params
 corr_asr = 0.8; % percent correlation with neighboring channels to retain it

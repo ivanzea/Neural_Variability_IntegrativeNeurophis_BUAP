@@ -82,7 +82,8 @@ for subjectindex = 1:length(subject_list)
 
            % Find events
            unique_events = unique([set_file.urevent.type]);
-
+           all_labels = {set_file.chanlocs.labels};
+           
            % Initialize set_info variable
            set_info = [];
 
