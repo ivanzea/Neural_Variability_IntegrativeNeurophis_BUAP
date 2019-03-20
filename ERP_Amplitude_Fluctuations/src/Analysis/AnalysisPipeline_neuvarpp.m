@@ -7,6 +7,7 @@ subject_list = {};
 
 % Overwrite files
 s1ovrwrt = 0;
+s2ovrwrt = 0;
 
 %% Detect running path 
 main_path = mfilename('fullpath');
@@ -44,5 +45,7 @@ addpath([main_path '\ext']); % extensions code
 close all;
 clc;
 
-%% 1) Convert CNT to SET files (EEGLAB standards)
+%% 1) Merge the preprocessing pipeline files into one unified data structure
 neurvarap_datamerge(main_path, s1ovrwrt);
+
+%% 2) Select channels 

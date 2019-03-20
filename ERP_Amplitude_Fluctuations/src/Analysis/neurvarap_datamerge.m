@@ -66,8 +66,8 @@ for fileindex = 1:length(file_list)
    if file_flag == 0
        % Get info from the file
        subject_name = regexprep(file_list{fileindex}, '(.+)_.+_\d{6}\d{3}_.+', '$1');
-       sess_date = regexprep(file_list{fileindex}, '.+_.+_(\d{6})\d{3}_.+', '$1');
-       sess_num = regexprep(file_list{fileindex}, '.+_.+_\d{6}(\d{3})_.+', '$1');
+       sess_id = regexprep(file_list{fileindex}, '.+_.+_(\d{6})\d{3}_.+', '$1');
+       block = regexprep(file_list{fileindex}, '.+_.+_\d{6}(\d{3})_.+', '$1');
        
        % Load the current file
        cfull = [ppdata_path '\' subject_name '\' cfile];
@@ -79,8 +79,8 @@ for fileindex = 1:length(file_list)
            
            erp_data(entry_index).filename = set_info(set_stim).filename;
            erp_data(entry_index).subject = subject_name;
-           erp_data(entry_index).sess_data = sess_data;
-           erp_data(entry_index).sess_num = sess_num;
+           erp_data(entry_index).sess_id = sess_id;
+           erp_data(entry_index).block = block;
            erp_data(entry_index).stimtype = set_info(set_stim).stimtype;
            erp_data(entry_index).chnames = set_info(set_stim).chnames;
            erp_data(entry_index).srate = set_info(set_stim).srate;
