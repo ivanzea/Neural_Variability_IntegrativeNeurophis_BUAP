@@ -82,15 +82,9 @@ for subjectindex = 1:length(subject_list)
 
            % Find events
            unique_events = unique([set_file.urevent.type]);
-           all_labels = {set_file.chanlocs.labels};
            
            % Initialize set_info variable
            set_info = [];
-
-           % Get general info
-           set_info.general.file_name = set_file.filename;
-           set_info.general.srate = set_file.srate;
-           set_info.general.chnames = all_labels;
 
            for stimtypeindex = 1:length(unique_events)
               % Generate epoch data with baseline correction
@@ -98,14 +92,12 @@ for subjectindex = 1:length(subject_list)
               epoch_set_file = pop_rmbase(epoch_set_file, bl_len);
 
               % Get all info from the set file
-              [~,loc_pair] = ismember(all_labels, {epoch_set_file.chanlocs.labels});
-              loc_pair(loc_pair == 0) = NaN;
-
-              for locindex = 1:length(all_labels)
-                 set_info.data(locindex).epoch{stimtypeindex} = squeeze(epoch_set_file.data(loc_pair(locindex),:,:));
-              end
-
-              set_info.general.time = epoch_set_file.times;
+              set_info(stimtypeindex).filename = regexprep(input_file_list{fileindex}, '(.+)_.+', '$1');
+              set_info(stimtypeindex).stimtype = unique_events(stimtypeindex);
+              set_info(stimtypeindex).chnames = {epoch_set_file.chanlocs.labels};
+              set_info(stimtypeindex).srate = set_file.srate;
+              set_info(stimtypeindex).times = epoch_set_file.times;
+              set_info(stimtypeindex).epochs = epoch_set_file.data;     
            end
 
            % Save the .set file in 'SetData' folder

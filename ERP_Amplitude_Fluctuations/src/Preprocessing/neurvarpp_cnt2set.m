@@ -81,13 +81,17 @@ for subjectindex = 1:length(subject_list)
        parfor fileindex = 1:length(input_file_list)
             if isempty(regexp(input_file_list{fileindex}, '(close|open|alpha)', 'once')) % avoid files used as references
                
-                % Import cnt files by converting to set files
+               % Import cnt files by converting to set files
+               try
                converted_set = pop_loadcnt([input_path '\' input_file_list{fileindex}], 'keystroke', 'on');
 
                % Save output files
                pop_saveset(converted_set, ...
                            'filename', output_file_list{fileindex}, ...
                            'filepath', output_path);
+               catch
+                   disp(['File Load Error: ' input_path '\' input_file_list{fileindex}]);
+               end
             end
        end
    end
