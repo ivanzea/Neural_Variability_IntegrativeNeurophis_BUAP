@@ -9,9 +9,9 @@ subject_list = {'Abraham'};
 s1ovrwrt = 0;
 s2ovrwrt = 0;
 s3ovrwrt = 0;
-s4ovrwrt = 1;
-s5ovrwrt = 1;
-s6ovrwrt = 1;
+s4ovrwrt = 0;
+s5ovrwrt = 0;
+s6ovrwrt = 0;
 
 % =========================================================================
 % Step 2 parameters:

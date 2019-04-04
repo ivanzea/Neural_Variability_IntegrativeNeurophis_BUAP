@@ -9,6 +9,12 @@ subject_list = {};
 s1ovrwrt = 0;
 s2ovrwrt = 0;
 
+% =========================================================================
+% Step 2 parameters:
+trial_thr = 25;
+block_thr = 7;
+stim_dict = {'Visual' 'Auditory' 'Somatosensory'};
+
 %% Detect running path 
 main_path = mfilename('fullpath');
 if ~isempty(main_path)
@@ -48,4 +54,5 @@ clc;
 %% 1) Merge the preprocessing pipeline files into one unified data structure
 neurvarap_datamerge(main_path, s1ovrwrt);
 
-%% 2) Select channels 
+%% 2) Analyze amplitude data
+neurvarap_amplitude(main_path, subject_list, trial_thr, block_thr, stim_dict, s2ovrwrt)

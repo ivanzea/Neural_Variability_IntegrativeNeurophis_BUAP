@@ -1,28 +1,89 @@
-%%
+function neurvarap_amplitude(main_path, subject_list, trial_thr, block_thr, stim_dict, overwrite)
+%{
+neurvarap_amplitude(main_path, subject_list, trial_thr, block_thr, stim_dict, overwrite=0)
+
+Merge all the final output data from the Preprocessing Pipeline into a
+single matlab structure
+
+Input:
+    main_path             String containing the full path to the Main folder.
+    
+    subject_list          Cell array of strings that contain the name of the
+                          folders under the RawData folder. The list and the
+                          folder names are assumed to be the subject names/tags
+                          with which they will be identified throughout the
+                          preprocessing pipeline. 
+                          Ex - {'SubjectI' 'SubjectII'}
+
+    trial_thr             Threshold value for the minimum number of trials
+                          required to have for each block for it not to be
+                          discarded
+
+    block_thr             Threshold value for the minimum number of blocks
+                          required. If the threshold is not passed the
+                          entire session is eliminated
+
+    stim_dict             Cell with names of stimulus types located in each
+                          position(index) representing the stimulus ID
+
+    overwrite             Boolean value where:
+                              0 -> skip files already converted.
+                              1 -> convert all files provided.
+                          Default = 0
+
+Output:
+    amplitude_data.mat    Matlab structure containing all ERP data and
+                          analyzed results <- amplitudes, metrics, pvalues
+%}
+%% Check input arguments
+% How many arguments?
+minArgs = 5;
+maxArgs = 6;
+narginchk(minArgs,maxArgs);
+
+% Set default values
+switch nargin
+    case 5
+        overwrite = 0;
+end
+
+% If subject varible is empty, use all subjects as targets
+if isempty(subject_list)
+    subject_list = unique({erp_data.subject});
+end
+
+%% Analyze Data :D
 % Load erp_data.mat file
 fprintf('Loading...');
 load([main_path '\FinalData\erp_data.mat'], 'erp_data');
 fprintf(' DONE\n');
 
-% Select channels and bounds to use to detect amplitudes
-% Make subject lists
-subject_list = {erp_data.subject};
-unique_subject = unique(subject_list);
-
+% Check if the data structure already exists and manage if the data should
+% be reanylized or skipped
 output_full = [main_path '\FinalData\amplitude_data.mat'];
-if exist(output_full, 'file') && ~overwrite% check if file exists
+if exist(output_full, 'file') % check if file exists
     load(output_full, 'amplitude_data'); % load existing file
     output_entry_index = length(amplitude_data);
-else
+elseif overwrite
     amplitude_data = [];
     amplitude_data.subject = '';
+    amplitude_data.ch = '';
     output_entry_index = 0;
 end
 
+% Select channels and bounds to use to detect amplitudes
 % Loop through each subject
-for subjectindex = 2:length(unique_subject)
+for subjectindex = 1:length(subject_list)
     % Make subject filter
-    subject_filter = ismember(subject_list, unique_subject{subjectindex});
+    subject_filter = ismember({erp_data.subject}, subject_list{subjectindex});
+    
+    % If overwrite, delete the keys that exists already
+    if overwrite
+        amplitude_data(ismember({amplitude_data.subject}, subject_list{subjectindex})) = [];
+        output_entry_index = output_entry_index - sum(ismember({amplitude_data.subject}, subject_list{subjectindex}));
+    elseif sum(ismember({amplitude_data.subject}, subject_list{subjectindex})) % skip subject if there is an entry already
+       continue; 
+    end
     
     % Select subject data
     subject_data = erp_data(subject_filter);
@@ -37,9 +98,6 @@ for subjectindex = 2:length(unique_subject)
     
     % =========================================================================
     % Step 1: Filter data by number of blocks and single trials
-    trial_thr = 25; % <--------------------------------------------------------------------------- VAR
-    block_thr = 7;  % <--------------------------------------------------------------------------- VAR
-    
     plot_data_temp = [];
     for dataindex = 1:length(subject_data)
         % Isolate selection
@@ -126,11 +184,10 @@ for subjectindex = 2:length(unique_subject)
             set(gca,'tag',num2str(chindex)); % add tag for selection followup
             axis tight;
         end
-        stim_dict = {'Visual' 'Auditory' 'Somatosensory'}; % <--------------------------------------------------------------------------- VAR
-        suptitle([unique_subject{subjectindex} ' : ' stim_dict{unique_stim(stimindex)}]);
+        suptitle([subject_list{subjectindex} ' : ' stim_dict{unique_stim(stimindex)}]);
         
         % Make channel selection
-        selected_ch ={};
+        selected_ch = [];
         while isempty(selected_ch)
             selected_ch = clicksubplot();
         end
@@ -211,8 +268,8 @@ for subjectindex = 2:length(unique_subject)
                 jitterX = [jitterX{:}];
                 
                 % Show max and min points in graph
-                scatter(t(segmentidx(maxpoints(2,:))), maxpoints(1,:), 100, 'k', 'filled');
-                scatter(t(segmentidx(minpoints(2,:))), minpoints(1,:), 100, 'k', 'filled');
+                scatter(t(segmentidx(maxpoints(2,:))), maxpoints(1,:), 100, 'g', 'filled');
+                scatter(t(segmentidx(minpoints(2,:))), minpoints(1,:), 100, 'r', 'filled');
                 hold off;
                 
                 % Calculate raw amplitudes
@@ -224,13 +281,11 @@ for subjectindex = 2:length(unique_subject)
                 scatter(jitterX, raw_amp, [], vertcat(color_scheme{grps}), 'filled');
                 boxplot(raw_amp, grps);
                 hold off;
-                pval = kruskalwallis(raw_amp, grps, 'off');
-                title(['RAW AMPLITUDES pval=' num2str(pval)]);
-                
-                % Calculate variance distribution approach
-                vardist = cellfun(@(y) std(abs(bsxfun(@minus, y, y'))).^2, splitapply(@(x) {x},raw_amp, grps), 'UniformOutput', false);
-                meandist = cellfun(@(y) mean(abs(bsxfun(@minus, y, y'))), splitapply(@(x) {x},raw_amp, grps), 'UniformOutput', false);
-                ampmetric = [vardist{:}]./[meandist{:}];
+                rawpval = kruskalwallis(raw_amp, grps, 'off');
+                title(['RAW AMPLITUDES pval=' num2str(rawpval)]);
+
+                ampmetric = cellfun(@(y) y-mean(y), splitapply(@(x) {x},raw_amp, grps), 'UniformOutput', false);
+                ampmetric = [ampmetric{:}];
                 
                 % Plot metric
                 subplot(2,6,[11 12]);
@@ -248,27 +303,48 @@ for subjectindex = 2:length(unique_subject)
                     if w == 1
                        key = get(gcf, 'currentcharacter');
                        if key == 27 % Esc key
-                            break
+                           break
+                       elseif key == 83 || key == 115
+                           independent_output = independent_session_selection(select_epochs, t, bound_ch{selectindex}, color_scheme);
+                           
+                           % Complete the output structure
+                           independent_output.subject = subject_list{subjectindex};
+                           independent_output.ch = bound_ch{selectindex};
+                           independent_output.stimtype = stim_dict{unique_stim(stimindex)};
+                           independent_output.fulldata = full_data(str2num(selected_ch{selectindex}),:);
+                           independent_output.meandata = mean_data(str2num(selected_ch{selectindex}),:);
+                           
+                           % Save selcted data
+                           gotonext = 1;
+                           output_entry_index = output_entry_index + 1;
+                           amplitude_data(output_entry_index) = independent_output;
+                           save(output_full, 'amplitude_data');
+                           
+                           % Clear all figures
+                           close all;
+                           break
                        else
                            gotonext = 1;
                            output_entry_index = output_entry_index + 1;
                            
                            % Save selection data
-                           amplitude_data(output_entry_index).subject = unique_subject{subjectindex};
+                           amplitude_data(output_entry_index).subject = subject_list{subjectindex};
                            amplitude_data(output_entry_index).ch = bound_ch{selectindex};
                            amplitude_data(output_entry_index).stimtype = stim_dict{unique_stim(stimindex)};
-                           amplitude_data(output_entry_index).fulldata = full_data;
-                           amplitude_data(output_entry_index).meandata = mean_data;
+                           amplitude_data(output_entry_index).fulldata = full_data(str2num(selected_ch{selectindex}),:);
+                           amplitude_data(output_entry_index).meandata = mean_data(str2num(selected_ch{selectindex}),:);
                            amplitude_data(output_entry_index).time = t;
                            amplitude_data(output_entry_index).rawamp = raw_amp;
                            amplitude_data(output_entry_index).metric = ampmetric;
                            amplitude_data(output_entry_index).grps = grps;
                            amplitude_data(output_entry_index).jitter = jitterX;
+                           amplitude_data(output_entry_index).rawpval = rawpval;
                            amplitude_data(output_entry_index).pval = pval;
+                           
+                           save(output_full, 'amplitude_data');
                            
                            % Clear figures
                            close all;
-                           
                            break
                        end
                     end
@@ -277,8 +353,3 @@ for subjectindex = 2:length(unique_subject)
         end
     end 
 end
-
-% Save results
-fprintf('Saving...');
-save(output_full, 'amplitude_data');
-fprintf(' DONE\n');
