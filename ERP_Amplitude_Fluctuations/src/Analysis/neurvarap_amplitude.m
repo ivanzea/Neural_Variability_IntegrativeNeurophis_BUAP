@@ -79,8 +79,8 @@ for subjectindex = 1:length(subject_list)
     
     % If overwrite, delete the keys that exists already
     if overwrite
-        amplitude_data(ismember({amplitude_data.subject}, subject_list{subjectindex})) = [];
         output_entry_index = output_entry_index - sum(ismember({amplitude_data.subject}, subject_list{subjectindex}));
+        amplitude_data(ismember({amplitude_data.subject}, subject_list{subjectindex})) = [];
     elseif sum(ismember({amplitude_data.subject}, subject_list{subjectindex})) % skip subject if there is an entry already
        continue; 
     end
@@ -254,10 +254,10 @@ for subjectindex = 1:length(subject_list)
                 % Step 5: Calculate amplitudes and apply variability metric
                 % Find max and min values withing boundaries
                 [ampval, ampidx] = cellfun(@max, y_segment, 'UniformOutput', false);
-                maxpoints = [[ampval{:}] ; [ampidx{:}]];
+                maxpoints = [[ampval{:}] ; t(segmentidx([ampidx{:}]))];
                 
                 [ampval, ampidx] = cellfun(@min, y_segment, 'UniformOutput', false);
-                minpoints = [[ampval{:}] ; [ampidx{:}]];
+                minpoints = [[ampval{:}] ; t(segmentidx([ampidx{:}]))];
                 
                 % Make grouping variable for session coloring and processing
                 grps = arrayfun(@(x,y) repmat(y,1,x), cellfun(@(x) size(x,2), y_segment), 1:size(y_segment,2), 'UniformOutput', false);
@@ -268,8 +268,8 @@ for subjectindex = 1:length(subject_list)
                 jitterX = [jitterX{:}];
                 
                 % Show max and min points in graph
-                scatter(t(segmentidx(maxpoints(2,:))), maxpoints(1,:), 100, 'g', 'filled');
-                scatter(t(segmentidx(minpoints(2,:))), minpoints(1,:), 100, 'r', 'filled');
+                scatter(maxpoints(2,:), maxpoints(1,:), 100, 'g', 'filled');
+                scatter(minpoints(2,:), minpoints(1,:), 100, 'r', 'filled');
                 hold off;
                 
                 % Calculate raw amplitudes
@@ -334,6 +334,8 @@ for subjectindex = 1:length(subject_list)
                            amplitude_data(output_entry_index).fulldata = full_data(str2num(selected_ch{selectindex}),:);
                            amplitude_data(output_entry_index).meandata = mean_data(str2num(selected_ch{selectindex}),:);
                            amplitude_data(output_entry_index).time = t;
+                           amplitude_data(output_entry_index).maxpt = maxpoints;
+                           amplitude_data(output_entry_index).minpt = minpoints;
                            amplitude_data(output_entry_index).rawamp = raw_amp;
                            amplitude_data(output_entry_index).metric = ampmetric;
                            amplitude_data(output_entry_index).grps = grps;

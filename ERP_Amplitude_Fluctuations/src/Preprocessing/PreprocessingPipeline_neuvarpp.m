@@ -3,7 +3,7 @@
 clear; clc; close all;
 %% Define Prprocessing Parameters
 % Subject names (folder names) to process | if empty {} -> all subjects/folders will be used
-subject_list = {'Abraham'};
+subject_list = {'Abraham', 'Diana', 'Jorge', 'Otto', 'Hector', 'Pedro', 'Ivan'};
 
 % Overwrite files
 s1ovrwrt = 0;

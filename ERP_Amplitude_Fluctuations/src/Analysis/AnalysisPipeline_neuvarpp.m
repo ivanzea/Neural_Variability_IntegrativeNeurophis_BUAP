@@ -3,11 +3,10 @@
 clear; clc; close all;
 %% Define Prprocessing Parameters
 % Subject names (folder names) to process | if empty {} -> all subjects/folders will be used
-subject_list = {};
+subject_list = {'Abraham', 'Diana', 'Jorge', 'Otto', 'Hector', 'Pedro', 'Ivan'};
 
 % Overwrite files
-s1ovrwrt = 0;
-s2ovrwrt = 0;
+s2ovrwrt = 1;
 
 % =========================================================================
 % Step 2 parameters:
@@ -52,7 +51,7 @@ close all;
 clc;
 
 %% 1) Merge the preprocessing pipeline files into one unified data structure
-neurvarap_datamerge(main_path, s1ovrwrt);
+neurvarap_datamerge(main_path);
 
 %% 2) Analyze amplitude data
-neurvarap_amplitude(main_path, subject_list, trial_thr, block_thr, stim_dict, s2ovrwrt)
+neurvarap_amplitude(main_path, subject_list, trial_thr, block_thr, stim_dict, s2ovrwrt);
